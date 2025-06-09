@@ -37,6 +37,12 @@ void APlayerChar::BeginPlay()
 	FTimerHandle StatsTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(StatsTimerHandle, this, &APlayerChar::DecreaseStats, 2.0f, true);
 	
+	if (objWidget)
+	{
+		objWidget->UpdatebuildObj(0.0f);
+		objWidget->UpdatematOBJ(0.0f);
+	}
+
 }
 
 // Called every frame
@@ -144,6 +150,13 @@ void APlayerChar::FindObject()
 					if (HitResource->totalResource > resourceValue)
 					{
 						GiveResources(resourceValue, hitName);
+
+						// Adds to the total of mats collected
+						matsCollected = matsCollected + resourceValue;
+
+						// Updates the widget with total collected mats
+						objWidget->UpdatematOBJ(matsCollected);
+
 						GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Resource Collected"));
 
 						// Spawning the decal at the location of hit with size 10, 10, 10 facing the player with lifespan of 2 seconds
@@ -165,6 +178,11 @@ void APlayerChar::FindObject()
 	else
 	{
 		isBuilding = false;
+		// Adds to the total of objects built
+		objectsBuilt = objectsBuilt + 1.0f;
+
+		// Updates widget with total of objects built
+		objWidget->UpdatebuildObj(objectsBuilt);
 	}
 }
 
