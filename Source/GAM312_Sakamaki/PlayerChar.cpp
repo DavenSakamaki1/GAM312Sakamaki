@@ -136,6 +136,8 @@ void APlayerChar::FindObject()
 		{
 			// Casting the hit actor to AResource_M
 			AResource_M* HitResource = Cast<AResource_M>(HitResult.GetActor());
+			// Casting the hit actor to AActor
+			AActor* HitEnemy = Cast<AActor>(HitResult.GetActor());
 			if (Stamina > 5.0f)
 			{ 
 				// Check if HitResource is valid
@@ -171,6 +173,18 @@ void APlayerChar::FindObject()
 						check(GEngine != nullptr);
 						GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Resource Depleted"));
 					}
+				}
+				// Check if AAIChar is valid
+				else if (HitEnemy)
+				{
+					AController* EventInstigator = GetInstigatorController(); // The controller responsible for the damage
+					AActor* DamageCauser = this; // The actor that is directly applying the damage
+					TSubclassOf<UDamageType> DamageTypeClass;
+					UGameplayStatics::ApplyDamage(HitEnemy, 5.0f, EventInstigator, DamageCauser, DamageTypeClass);
+
+					UGameplayStatics::SpawnDecalAtLocation(GetWorld(), hitDecal, FVector(10.0f, 10.0f, 10.0f), HitResult.Location, FRotator(-90, 0, 0), 2.0f);
+
+					SetStamina(-5.0f);
 				}
 			}
 		}
